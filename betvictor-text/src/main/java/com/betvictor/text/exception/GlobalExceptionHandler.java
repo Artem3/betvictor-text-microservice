@@ -19,4 +19,11 @@ public class GlobalExceptionHandler {
         log.error(errorMsg);
         return errorMsg;
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handleRuntimeException(RuntimeException ex) {
+        log.error("RuntimeException occurred: {}", ex.getMessage());
+        return ex.getMessage();
+    }
 }

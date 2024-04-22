@@ -5,6 +5,7 @@ import lombok.Builder;
 
 @Builder
 public record MetricsResponseDTO(
+
         @JsonProperty("freq_word")
         String freqWord,
 
