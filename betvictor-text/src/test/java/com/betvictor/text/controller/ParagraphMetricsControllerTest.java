@@ -28,17 +28,12 @@ class ParagraphMetricsControllerTest {
 
     @Test
     void generateText() throws Exception {
-        var expectedResponce = MetricsResponseDTO.builder()
-                .freqWord("OK")
-                .avgParagraphSize(5.5)
-                .avgParagraphProcessingTime(7.7)
-                .totalProcessingTime(10.1)
-                .build();
-        when(paragraphMetricsService.getMetrics(anyInt(), anyString())).thenReturn(expectedResponce);
+        var expectedResponse = new MetricsResponseDTO("OK", 5.5, "700ns", "550ns");
+        when(paragraphMetricsService.getMetrics(anyInt(), anyString())).thenReturn(expectedResponse);
 
         mockMvc.perform(get("/betvictor/text?p=1&l=short"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.avg_paragraph_processing_time").value(7.7));
+                .andExpect(jsonPath("$.avg_paragraph_processing_time").value("700ns"));
 
         verify(paragraphMetricsService, times(1)).getMetrics(anyInt(), anyString());
     }

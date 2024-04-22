@@ -1,11 +1,14 @@
 package com.betvictor.text.service;
 
+
 import com.betvictor.text.dto.MetricsResponseDTO;
+import com.betvictor.text.util.TimeUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,6 +25,11 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class ParagraphMetricsService {
 
+    public static final String EMPTY = "";
+    public static final String WORD = "\\s+";
+    public static final String PUNCTUATION = "[.,;:!?]+$";
+    private static final Pattern PARAGRAPH_PATTERN = Pattern.compile("<p>(.*?)</p>", Pattern.DOTALL);
+
     private final WebClient webClient;
 
     public MetricsResponseDTO getMetrics(int paragraphsQty, String paragraphLengthType) {
@@ -29,12 +37,10 @@ public class ParagraphMetricsService {
         String rawTextResponse = executeRequest(paragraphsQty, paragraphLengthType);
         log.debug(rawTextResponse);
 
-        Pattern pattern = Pattern.compile("<p>(.*?)</p>", Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(rawTextResponse);
-
+        Matcher matcher = PARAGRAPH_PATTERN.matcher(rawTextResponse);
         AtomicInteger totalWords = new AtomicInteger(0);
         AtomicInteger totalParagraphs = new AtomicInteger(0);
-
+        AtomicLong totalProcessingTime = new AtomicLong(0);
         Map<String, Integer> frequencyMap = new HashMap<>();
         AtomicInteger maxFrequency = new AtomicInteger(0);
         AtomicReference<String> mostFrequentWord = new AtomicReference<>("");
@@ -42,9 +48,10 @@ public class ParagraphMetricsService {
         Stream.generate(() -> matcher.find() ? matcher.group(1) : null)
                 .takeWhile(Objects::nonNull)
                 .forEach(paragraph -> {
-                    int wordCount = Arrays.stream(paragraph.split("\\s+"))
+                    long startTime = System.nanoTime();
+                    int wordCount = Arrays.stream(paragraph.split(WORD))
                             .filter(word -> !word.isEmpty())
-                            .map(word -> word.replaceAll("[.,;:!?]+$", ""))
+                            .map(word -> word.replaceAll(PUNCTUATION, EMPTY))
                             .map(String::toLowerCase)
                             .peek(word -> updateFrequencyMap(word, frequencyMap, mostFrequentWord, maxFrequency))
                             .mapToInt(word -> 1)
@@ -52,16 +59,23 @@ public class ParagraphMetricsService {
                     totalWords.addAndGet(wordCount);
                     totalParagraphs.incrementAndGet();
                     log.debug("Total words per paragraph: {}", wordCount);
+
+                    long perParagraphElapsedTime = System.nanoTime() - startTime;
+                    totalProcessingTime.addAndGet(perParagraphElapsedTime);
+                    log.debug("Time to process paragraph: {} ns", perParagraphElapsedTime);
                 });
 
         double averageWords = (double) totalWords.get() / totalParagraphs.get();
+        long averageTime = totalProcessingTime.get() / totalParagraphs.get();
 
+        log.debug("--------------------");
         log.debug("Total paragraphs: {}", totalParagraphs.get());
         log.debug("Total words in whole text: {}", totalWords.get());
+        log.debug("Most frequent word: '{}'. Occurrences: {}", mostFrequentWord.get(), maxFrequency.get());
         log.debug("Average number of words per paragraph: {}", String.format("%.1f", averageWords));
-        log.debug("Most frequent word: '{}' - Occurrences: {}", mostFrequentWord.get(), maxFrequency.get());
+        log.debug("Average processing time per paragraph: {}", TimeUtils.formatDuration(averageTime));
 
-        return new MetricsResponseDTO("BetVictor", 5.5, 100.0, 200.0);
+        return new MetricsResponseDTO(mostFrequentWord.get(), averageWords, TimeUtils.formatDuration(averageTime), null);
     }
 
     private String executeRequest(int paragraphsQty, String paragraphLengthType) {

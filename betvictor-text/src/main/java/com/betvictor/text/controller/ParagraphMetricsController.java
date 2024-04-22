@@ -2,6 +2,7 @@ package com.betvictor.text.controller;
 
 import com.betvictor.text.dto.MetricsResponseDTO;
 import com.betvictor.text.service.ParagraphMetricsService;
+import com.betvictor.text.util.TimeUtils;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,10 @@ public class ParagraphMetricsController {
     public MetricsResponseDTO generateText(
             @RequestParam("p") @Min(1) int paragraphsQty,
             @RequestParam("l") @Pattern(regexp = "short|medium|long|verylong") String paragraphLengthType) {
-        return paragraphMetricsService.getMetrics(paragraphsQty, paragraphLengthType);
+        long startTime = System.nanoTime();
+        MetricsResponseDTO metrics = paragraphMetricsService.getMetrics(paragraphsQty, paragraphLengthType);
+        metrics.setTotalProcessingTime(TimeUtils.formatDuration((System.nanoTime() - startTime)));
+
+        return metrics;
     }
 }

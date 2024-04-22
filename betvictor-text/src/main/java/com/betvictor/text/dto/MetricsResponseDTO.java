@@ -1,21 +1,24 @@
 package com.betvictor.text.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Builder
-public record MetricsResponseDTO(
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class MetricsResponseDTO {
 
-        @JsonProperty("freq_word")
-        String freqWord,
+    @JsonProperty("freq_word")
+    private String freqWord;
 
-        @JsonProperty("avg_paragraph_size")
-        double avgParagraphSize,
+    @JsonProperty("avg_paragraph_size")
+    private double avgParagraphSize;
 
-        @JsonProperty("avg_paragraph_processing_time")
-        double avgParagraphProcessingTime,
+    @JsonProperty("avg_paragraph_processing_time")
+    private String avgParagraphProcessingTime;
 
-        @JsonProperty("total_processing_time")
-        double totalProcessingTime
-) {
+    @JsonProperty("total_processing_time")
+    private String totalProcessingTime;
 }
