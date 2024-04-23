@@ -2,7 +2,7 @@ package com.betvictor.text.service;
 
 
 import com.betvictor.text.dto.MetricsResponseDTO;
-import com.betvictor.text.util.TimeUtils;
+import com.betvictor.text.util.TimeUtil;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -73,9 +73,9 @@ public class ParagraphMetricsService {
         log.debug("Total words in whole text: {}", totalWords.get());
         log.debug("Most frequent word: '{}'. Occurrences: {}", mostFrequentWord.get(), maxFrequency.get());
         log.debug("Average number of words per paragraph: {}", String.format("%.1f", averageWords));
-        log.debug("Average processing time per paragraph: {}", TimeUtils.formatDuration(averageTime));
+        log.debug("Average processing time per paragraph: {}", TimeUtil.formatDuration(averageTime));
 
-        return new MetricsResponseDTO(mostFrequentWord.get(), averageWords, TimeUtils.formatDuration(averageTime), null);
+        return new MetricsResponseDTO(mostFrequentWord.get(), averageWords, TimeUtil.formatDuration(averageTime), null);
     }
 
     private String executeRequest(int paragraphsQty, String paragraphLengthType) {

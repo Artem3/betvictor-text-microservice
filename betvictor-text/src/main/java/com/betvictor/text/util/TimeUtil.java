@@ -4,7 +4,7 @@ import lombok.experimental.UtilityClass;
 import java.util.concurrent.TimeUnit;
 
 @UtilityClass
-public class TimeUtils {
+public class TimeUtil {
     /**
      * Formats the given duration in nanoseconds to a human-readable format.
      * @param nanoSeconds The duration in nanoseconds.

@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.betvictor.text.dto.MetricsResponseDTO;
+import com.betvictor.text.kafka.KafkaProducerService;
 import com.betvictor.text.service.ParagraphMetricsService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ class ParagraphMetricsControllerTest {
 
     @MockBean
     private ParagraphMetricsService paragraphMetricsService;
+
+    @MockBean
+    private KafkaProducerService producerService;
 
     @Autowired
     private MockMvc mockMvc;
