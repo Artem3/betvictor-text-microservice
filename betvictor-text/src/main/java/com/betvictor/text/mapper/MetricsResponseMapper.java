@@ -1,7 +1,7 @@
 package com.betvictor.text.mapper;
 
 import com.betvictor.text.dto.MetricsResponseDTO;
-import com.betvictor.text.kafka.MetricsResponseMsg;
+import com.betvictor.text.kafka.payload.MetricsResponseMsg;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass

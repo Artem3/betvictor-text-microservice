@@ -1,5 +1,6 @@
 package com.betvictor.text.kafka;
 
+import com.betvictor.text.kafka.payload.MetricsResponseMsg;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +20,7 @@ public class KafkaProducerService {
     public void sendMessage(MetricsResponseMsg message) {
         var future = kafkaTemplate.send(topicName, message.getFreqWord(), message);
         future.thenAccept(result ->
-                        log.debug("Message sent successfully to topic {}, on partition {}, with offset {}",
+                        log.debug("Message sent successfully to topic '{}', on partition {}, with offset {}",
                                 result.getProducerRecord().topic(),
                                 result.getRecordMetadata().partition(),
                                 result.getRecordMetadata().offset()))
